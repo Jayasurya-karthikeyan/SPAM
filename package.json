@@ -9,10 +9,34 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/vector-icons": "^13.0.0",
+    "@react-navigation/drawer": "^6.6.2",
+    "@react-navigation/native": "^6.1.6",
+    "@react-navigation/native-stack": "^6.9.12",
+    "@react-navigation/stack": "^6.3.16",
+    "@tensorflow/tfjs": "^4.5.0",
+    "axios": "^1.4.0",
+    "base-64": "^1.0.0",
     "expo": "~48.0.15",
+    "expo-camera": "^13.2.1",
+    "expo-face-detector": "^12.1.1",
+    "expo-location": "^15.1.1",
+    "expo-mail-composer": "^12.1.1",
+    "expo-print": "^12.2.1",
+    "expo-sharing": "^11.2.2",
     "expo-status-bar": "~1.4.4",
+    "firebase": "^9.22.0",
     "react": "18.2.0",
-    "react-native": "0.71.7"
+    "react-native": "0.71.7",
+    "react-native-communications": "^2.2.1",
+    "react-native-crypto": "^2.2.0",
+    "react-native-gesture-handler": "^2.10.0",
+    "react-native-maps": "^1.7.1",
+    "react-native-paper": "^5.7.2",
+    "react-native-reanimated": "~2.14.4",
+    "react-native-vector-icons": "^9.2.0",
+    "sentiment": "^5.0.2",
+    "twilio": "^4.11.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
