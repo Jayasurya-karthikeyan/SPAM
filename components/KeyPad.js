@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { auth, db } from "../FireBase";
-import { get, ref, set } from "firebase/database";
-import { Button, TextInput } from "react-native-paper";
+import { get, ref, set, TextInput } from "firebase/database";
+import { Button } from "react-native-paper";
 import Sentiment from "sentiment";
 
 export default function KeyPad() {
@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f6fabc",
     alignItems: "center",
     justifyContent: "center",
+    padding:20
   },
   input: {
     height: 40,

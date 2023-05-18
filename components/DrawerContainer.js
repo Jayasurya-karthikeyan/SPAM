@@ -13,9 +13,11 @@ import AppUsage from "./AppUsage";
 import Profile from "./Profile";
 import Emotion from "./Emotion";
 import LoginStackNavigator from "./LoginStackNavigator";
+import { auth } from "../FireBase";
 const Drawer = createDrawerNavigator();
 
 export default function DrawerContainer(props) {
+  const currentUser = auth.currentUser;
   return (
     // <NavigationContainer>
     <Drawer.Navigator
@@ -44,69 +46,74 @@ export default function DrawerContainer(props) {
           ),
         }}
       />
-      <Drawer.Screen
-        name="Activities"
-        component={Activities}
-        options={{
-          drawerIcon: ({ color }) => (
-            <AntDesign name="filter" size={25} color={color} />
-          ),
-        }}
-      />
-      <Drawer.Screen
-        name="Location"
-        component={Location}
-        options={{
-          drawerIcon: ({ color }) => (
-            <AntDesign name="profile" size={25} color={color} />
-          ),
-        }}
-      />
-      <Drawer.Screen
-        name="KeyPad"
-        component={KeyPad}
-        options={{
-          drawerIcon: ({ color }) => (
-            <AntDesign name="shrink" size={25} color={color} />
-          ),
-        }}
-      />
-      <Drawer.Screen
-        name="AppUsage"
-        component={AppUsage}
-        options={{
-          drawerIcon: ({ color }) => (
-            <AntDesign name="caretup" size={25} color={color} />
-          ),
-        }}
-      />
-      <Drawer.Screen
-        name="Emotion"
-        component={Emotion}
-        options={{
-          drawerIcon: ({ color }) => (
-            <AntDesign name="caretup" size={25} color={color} />
-          ),
-        }}
-      />
-      <Drawer.Screen
-        name="Report"
-        component={Report}
-        options={{
-          drawerIcon: ({ color }) => (
-            <AntDesign name="table" size={25} color={color} />
-          ),
-        }}
-      />
-      <Drawer.Screen
-        name="User Profile"
-        component={Profile}
-        options={{
-          drawerIcon: ({ color }) => (
-            <AntDesign name="user" size={25} color={color} />
-          ),
-        }}
-      />
+      {currentUser && (
+        <>
+          <Drawer.Screen
+            name="Activities"
+            component={Activities}
+            options={{
+              drawerIcon: ({ color }) => (
+                <AntDesign name="filter" size={25} color={color} />
+              ),
+            }}
+          />
+          <Drawer.Screen
+            name="Location"
+            component={Location}
+            options={{
+              drawerIcon: ({ color }) => (
+                <AntDesign name="profile" size={25} color={color} />
+              ),
+            }}
+          />
+          <Drawer.Screen
+            name="KeyPad"
+            component={KeyPad}
+            options={{
+              drawerIcon: ({ color }) => (
+                <AntDesign name="shrink" size={25} color={color} />
+              ),
+            }}
+          />
+          <Drawer.Screen
+            name="AppUsage"
+            component={AppUsage}
+            options={{
+              drawerIcon: ({ color }) => (
+                <AntDesign name="caretup" size={25} color={color} />
+              ),
+            }}
+          />
+          <Drawer.Screen
+            name="Emotion"
+            component={Emotion}
+            options={{
+              drawerIcon: ({ color }) => (
+                <AntDesign name="caretup" size={25} color={color} />
+              ),
+            }}
+          />
+          <Drawer.Screen
+            name="Report"
+            component={Report}
+            options={{
+              drawerIcon: ({ color }) => (
+                <AntDesign name="table" size={25} color={color} />
+              ),
+            }}
+          />
+          <Drawer.Screen
+            name="User Profile"
+            component={Profile}
+            options={{
+              drawerIcon: ({ color }) => (
+                <AntDesign name="user" size={25} color={color} />
+              ),
+            }}
+          />
+        </>
+      )}
+
       <Drawer.Screen
         name="Help"
         component={HelpPage}

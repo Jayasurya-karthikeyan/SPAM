@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, Button } from "react-native";
 import { Camera } from "expo-camera";
 import * as FaceDetector from "expo-face-detector";
 import { auth, db } from "../FireBase";
 import { get, ref, set } from "firebase/database";
-
 
 export default function Emotion() {
   const [hasPermission, setHasPermission] = useState(null);
@@ -32,7 +31,7 @@ export default function Emotion() {
 
   useEffect(() => {
     requestCameraPermission();
-    loadModel();
+    // loadModel();
   }, []);
 
   const loadModel = async () => {
@@ -61,37 +60,37 @@ export default function Emotion() {
   const currentUser = auth.currentUser;
   const userId = currentUser.uid;
 
-    const getEmotion = (faceData) => {
-      const leftEye = faceData.LEFT_EYE;
-      const rightEye = faceData.RIGHT_EYE;
-      const noseTip = faceData.NOSE_BASE;
-      const mouthLeft = faceData.LEFT_MOUTH;
-      const mouthRight = faceData.RIGHT_MOUTH;
+  const getEmotion = (faceData) => {
+    const leftEye = faceData.LEFT_EYE;
+    const rightEye = faceData.RIGHT_EYE;
+    const noseTip = faceData.NOSE_BASE;
+    const mouthLeft = faceData.LEFT_MOUTH;
+    const mouthRight = faceData.RIGHT_MOUTH;
 
-      const distance = (point1, point2) => {
-        return Math.sqrt(
-          Math.pow(point1.x - point2.x, 2) + Math.pow(point1.y - point2.y, 2)
-        );
-      };
-
-      const eyeDistance = distance(leftEye, rightEye);
-      const mouthDistance = distance(mouthLeft, mouthRight);
-
-      const eyeHeightDiff = (leftEye.y - rightEye.y) / eyeDistance;
-      const mouthHeightDiff = (mouthLeft.y - mouthRight.y) / mouthDistance;
-
-      if (eyeHeightDiff > 0.25 && mouthHeightDiff < -0.2) {
-        return "Happy";
-      } else if (eyeHeightDiff < -0.25 && mouthHeightDiff > 0.2) {
-        return "Sad";
-      } else if (eyeHeightDiff < -0.25 && mouthHeightDiff < -0.2) {
-        return "Angry";
-      } else if (eyeHeightDiff > 0.25 && mouthHeightDiff > 0.2) {
-        return "Surprised";
-      } else {
-        return "Neutral";
-      }
+    const distance = (point1, point2) => {
+      return Math.sqrt(
+        Math.pow(point1.x - point2.x, 2) + Math.pow(point1.y - point2.y, 2)
+      );
     };
+
+    const eyeDistance = distance(leftEye, rightEye);
+    const mouthDistance = distance(mouthLeft, mouthRight);
+
+    const eyeHeightDiff = (leftEye.y - rightEye.y) / eyeDistance;
+    const mouthHeightDiff = (mouthLeft.y - mouthRight.y) / mouthDistance;
+
+    if (eyeHeightDiff > 0.25 && mouthHeightDiff < -0.2) {
+      return "Happy";
+    } else if (eyeHeightDiff < -0.25 && mouthHeightDiff > 0.2) {
+      return "Sad";
+    } else if (eyeHeightDiff < -0.25 && mouthHeightDiff < -0.2) {
+      return "Angry";
+    } else if (eyeHeightDiff > 0.25 && mouthHeightDiff > 0.2) {
+      return "Surprised";
+    } else {
+      return "Neutral";
+    }
+  };
 
   const handleFacesDetected = ({ faces }) => {
     // console.log(faces);
@@ -134,16 +133,16 @@ export default function Emotion() {
 
               if (userIndex !== -1) {
                 // User found, update the location parameter
-                  usersArray[userIndex].emotion = emotionn;
+                usersArray[userIndex].emotion = emotionn;
 
-                  // Set the updated array back to the "Users" reference in the database
-                  set(usersRef, usersArray)
-                    .then(() => {
-                      console.log("Emotion data added successfully.");
-                    })
-                    .catch((error) => {
-                      console.error("Error adding Emotion data:", error);
-                    });
+                // Set the updated array back to the "Users" reference in the database
+                set(usersRef, usersArray)
+                  .then(() => {
+                    console.log("Emotion data added successfully.");
+                  })
+                  .catch((error) => {
+                    console.error("Error adding Emotion data:", error);
+                  });
               } else {
                 console.log("User not found.");
               }
@@ -184,10 +183,23 @@ export default function Emotion() {
       {!detect && (
         <View style={styles.buttonContainer}>
           {/* <TouchableOpacity style={styles.button} onPress={startCamera}> */}
-          <Text style={styles.text}>
-            {sum / 10 < 0.1 ? "Sad" : sum / 10 < 0.4 ? "Neutral" : "Happy"}
-          </Text>
-          {/* </TouchableOpacity> */}
+          <View>
+            <Text style={styles.text1}>Your current emotion is:</Text>
+            <Text style={styles.text}>
+              {sum / 10 < 0.1 ? "Sad" : sum / 10 < 0.4 ? "Neutral" : "Happy"}
+            </Text>
+          </View>
+
+          <View style={styles.btn}>
+            <Button
+              title="Recognise Emotion"
+              onPress={() => {
+                setDetect(true);
+                setSum(0);
+              }}
+            />
+            {/* </TouchableOpacity> */}
+          </View>
         </View>
       )}
     </View>
@@ -208,15 +220,23 @@ const styles = StyleSheet.create({
     // display: "none",
   },
   buttonContainer: {
-    flex: 0.1,
+    // flex: 0.1,
     backgroundColor: "transparent",
-    flexDirection: "row",
+    // flexDirection: "row",
     margin: 20,
+  },
+  btn: {
+    margin: 20,
+    marginTop: 30,
   },
   button: {
     flex: 0.1,
     alignSelf: "flex-end",
     alignItems: "center",
+  },
+  text1: {
+    fontSize: 30,
+    color: "#000",
   },
   text: {
     fontSize: 80,

@@ -4,8 +4,8 @@ import { StyleSheet, Text, View, Button, TextInput } from "react-native";
 import { useEffect, useState } from "react";
 import { printToFileAsync } from "expo-print";
 import { shareAsync } from "expo-sharing";
-import { db, messaging,auth } from "../FireBase";
-import { ref, onValue } from "firebase/database";
+import { db, messaging, auth } from "../FireBase";
+import { ref, onValue, get } from "firebase/database";
 import database from "firebase/database";
 import * as MailComposer from "expo-mail-composer";
 import * as Print from "expo-print";
@@ -37,39 +37,107 @@ export default function Report() {
   //   });
   // };
   const currentUser = auth.currentUser;
-  if (currentUser) {
-    const userId = currentUser.uid;
-    console.log("Current user ID:", userId);
-  } else {
-    console.log("No user is currently logged in.");
-  }
+  // if (currentUser) {
+  const userId = currentUser.uid;
+  // console.log("Current user ID:", userId);
+  // } else {
+  //   console.log("No user is currently logged in.");
+  // }
 
   useEffect(() => {
-    onValue(ref(db), (snapshot) => {
-      const data = snapshot.val();
+    const usersRef = ref(db, "Users");
+    if (currentUser) {
+      get(usersRef)
+        .then((snapshot) => {
+          const usersData = snapshot.val();
+          let usersArray;
 
-      if (data !== null) {
-        const firstReport = Object.values(data)[0]; // get the first item
-        setData([firstReport]); // set the report state with the first item only
-      }
-    });
+          // If "Users" data doesn't exist, create a new array
+          if (!usersData) {
+            usersArray = [];
+          } else {
+            // If "Users" data exists, convert it to an array
+            usersArray = Object.values(usersData);
+          }
+
+          // Find the user with the matching user ID
+          const userIndex = usersArray.findIndex((user) => user.uid === userId);
+
+          if (userIndex !== -1) {
+            // User found, update the location parameter
+            setData(usersArray[userIndex]);
+            console.log(usersArray[userIndex]);
+          } else {
+            console.log("User not found.");
+          }
+        })
+        .catch((error) => {
+          console.error("Error retrieving current user data:", error);
+        });
+    } else {
+      console.log("No user is currently logged in.");
+    }
+    console.log(data);
   }, []);
 
-  console.log(data);
-
   const html = `
-      <html>
-        <body>
-          <h1>Hi, this is your child's activity</h1>
-                  <h2>He is in the location:${data[0]?.Location.Area} </h2>
 
-                    <h2>He had been in the state: ${data[0]?.Emotion} for the past 3 hours</h2>
+<html>
+<head>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background-color: #f9f9f9;
+            font-size: 18px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        .json-key {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <table>
 
-          <h2>He had done Negative Search: ${data[0]?.Search.Search}</h2>
-               <h2>He used the mobile apps for the past ${data[0]?.App}</h2>
+        <tr>
+            <td class="json-key">uid</td>
+            <td>${data?.uid}</td>
+        </tr>
+        <tr>
+            <td class="json-key">email</td>
+            <td>${data?.email}</td>
+        </tr>        <tr>
+            <td class="json-key">phone</td>
+            <td>${data?.phone}</td>
+        </tr>
+        <tr>
+            <td class="json-key">type</td>
+            <td>${data?.type}</td>
+        </tr>
+        <tr>
+            <td class="json-key">search</td>
+            <td>${data?.Search}</td>
+        </tr>
+        <tr>
+            <td class="json-key">emotion</td>
+            <td>${data?.emotion}</td>
+        </tr>
+    </table>
+</body>
+</html>
 
-        </body>
-      </html>
     `;
 
   // const html = `
@@ -101,10 +169,53 @@ export default function Report() {
           The Report is generated based on the usage of your child's activity
         </Text>
       </View>
-
-      <Button title="Generate PDF" onPress={generatePdf} />
-      {/* <Button title="send mail" onPress={sendMail} /> */}
+      <View style={styles.bttn}>
+        <Button title="Generate PDF" onPress={generatePdf} />
+      </View>
+      {/* <View style={styles.table}>
+        <Text style={styles.keyText}>uid</Text>
+        <Text style={styles.valueText}>{data?.uid}</Text>
+      </View>
+      <View style={styles.table}>
+        <Text style={styles.keyText}>email</Text>
+        <Text style={styles.valueText}>{data?.email}</Text>
+      </View> */}
+      <View style={styles.table}>
+        <Text style={styles.keyText}>fullname</Text>
+        <Text style={styles.valueText}>{data?.fullname}</Text>
+      </View>
+      {/* <View style={styles.table}>
+        <Text style={styles.keyText}>phone</Text>
+        <Text style={styles.valueText}>{data?.phone}</Text>
+      </View> */}
+      <View style={styles.table}>
+        <Text style={styles.keyText}>type</Text>
+        <Text style={styles.valueText}>{data?.type}</Text>
+      </View>
+      <View style={styles.table}>
+        <Text style={styles.keyText}>search</Text>
+        <Text style={styles.valueText}>{data?.Search}</Text>
+      </View>
+      <View style={styles.table}>
+        <Text style={styles.keyText}>emotion</Text>
+        <Text style={styles.valueText}>{data?.emotion}</Text>
+      </View>
+      {/* <View style={styles.table}>
+        <Text style={styles.keyText}>location</Text>
+        <Text style={styles.valueText}>{data?.location}</Text>
+      </View> */}
     </View>
+    // <View style={styles.container}>
+    //   <Text style={styles.text}>Today's Report</Text>
+    //   <View>
+    //     <Text style={styles.desc}>
+    //       The Report is generated based on the usage of your child's activity
+    //     </Text>
+    //   </View>
+
+    //   <Button title="Generate PDF" onPress={generatePdf} />
+    //   {/* <Button title="send mail" onPress={sendMail} /> */}
+    // </View>
   );
 
   // return (
@@ -120,13 +231,13 @@ export default function Report() {
 }
 
 const styles = StyleSheet.create({
+  // const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-    // backgroundColor: "#fff",
+    flex: 1,
+    backgroundColor: "#F9F9F9",
+    padding: 20,
     alignItems: "center",
-    justifyContent: "center",
-    paddingBottom: 5,
-    paddingTop: 10,
+    // justifyContent: "center",
   },
   textInput: {
     alignSelf: "stretch",
@@ -146,4 +257,26 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontWeight: "bold",
   },
+  bttn: {
+    marginBottom: 15,
+    // marginTop: 200,
+  },
+  table: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+    marginTop: 20,
+  },
+  keyText: {
+    fontWeight: "bold",
+    width: "40%",
+    fontSize: 18,
+    color: "#333333",
+  },
+  valueText: {
+    width: "60%",
+    fontSize: 18,
+    color: "#555555",
+  },
+  // });
 });

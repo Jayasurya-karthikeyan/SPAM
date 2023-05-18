@@ -7,6 +7,7 @@ import { ref, get, set } from "firebase/database";
 import Communications from "react-native-communications";
 import axios from "axios";
 import { encode } from "base-64";
+import Geocoder from "react-native-geocoding";
 
 export default function App() {
   const pin1 = {
@@ -85,7 +86,25 @@ export default function App() {
     // }
   };
 
-  const alertParent = (distance, location) => {
+  const getAddress = async () => {
+    const address = await Location.reverseGeocodeAsync({
+      latitude,
+      longitude,
+    });
+
+    if (address.length > 0) {
+      const { street, city, region, postalCode, country } = address[0];
+      const fullAddress = `${street}, ${city}, ${region}, ${postalCode}, ${country}`;
+      console.log("Address:", fullAddress);
+      return address;
+    } else {
+      console.log("No address found");
+    }
+  };
+
+  const alertParent = async (distance, location) => {
+    const address = await getAddress();
+
     const usersRef = ref(db, "Users");
     get(usersRef)
       .then((snapshot) => {
@@ -141,7 +160,7 @@ export default function App() {
       }; // Replace "Your Location" with the actual location data
 
       // Retrieve the current "Users" data from the database
-                get(usersRef)
+      get(usersRef)
         .then((snapshot) => {
           const usersData = snapshot.val();
           let usersArray;

@@ -1,20 +1,68 @@
-import React from "react";
+import { get, ref } from "firebase/database";
+import React, { useEffect, useState } from "react";
 import { View, Image, StyleSheet, Text } from "react-native";
 import { TouchableOpacity } from "react-native";
+import { auth, db } from "../FireBase";
 
 export default function Profile({ navigation }) {
+  const [data, setData] = useState([]);
+
+  const currentUser = auth.currentUser;
+  // if (currentUser) {
+  const userId = currentUser.uid;
+  // console.log("Current user ID:", userId);
+  // } else {
+  //   console.log("No user is currently logged in.");
+  // }
+
+  useEffect(() => {
+    const usersRef = ref(db, "Users");
+    if (currentUser) {
+      get(usersRef)
+        .then((snapshot) => {
+          const usersData = snapshot.val();
+          let usersArray;
+
+          // If "Users" data doesn't exist, create a new array
+          if (!usersData) {
+            usersArray = [];
+          } else {
+            // If "Users" data exists, convert it to an array
+            usersArray = Object.values(usersData);
+          }
+
+          // Find the user with the matching user ID
+          const userIndex = usersArray.findIndex((user) => user.uid === userId);
+
+          if (userIndex !== -1) {
+            // User found, update the location parameter
+            setData(usersArray[userIndex]);
+            console.log(usersArray[userIndex]);
+          } else {
+            console.log("User not found.");
+          }
+        })
+        .catch((error) => {
+          console.error("Error retrieving current user data:", error);
+        });
+    } else {
+      console.log("No user is currently logged in.");
+    }
+    console.log(data);
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>User Profile</Text>
       </View>
       <View style={styles.profileContainer}>
-        <Text style={styles.profileItem}>MANOJ S</Text>
-        <Text style={styles.profileItem}>manoj@gmail.com</Text>
+        <Text style={styles.profileItem}>{data?.fullname}</Text>
+        <Text style={styles.profileItem}>{data?.email}</Text>
         <Text style={styles.profileItem}>
           LICET, Nungambakkam, Chennai, India
         </Text>
-        <Text style={styles.profileItem}>89898990</Text>
+        <Text style={styles.profileItem}>{data?.phone}</Text>
         <TouchableOpacity
           style={styles.buttonContainer}
           onPress={() => navigation.navigate("Home")}

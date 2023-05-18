@@ -1,21 +1,13 @@
 import React from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  ImageBackground,
-  Keyboard,
-  Alert,
-} from "react-native";
+import { View, StyleSheet, Text, Keyboard, Alert } from "react-native";
 import { TextInput, Button } from "react-native-paper";
-import image from "../assets/login.png";
+import { LinearGradient } from "expo-linear-gradient";
 import { auth } from "../FireBase";
 
-// export default function Login({ navigation }) {
+
 export default function Login({ navigation }) {
   const [inputs, setInputs] = React.useState({ email: "", password: "" });
   const [errors, setErrors] = React.useState({});
-  // const [loading, setLoading] = React.useState(false);
 
   const validate = async () => {
     Keyboard.dismiss();
@@ -37,10 +29,9 @@ export default function Login({ navigation }) {
           navigation.navigate("Home");
         })
         .catch((error) => {
-          alert("Error Loging in! Try again!");
+          alert("Error Logging in! Try again!");
           console.log(error.message);
         });
-      // login();
     }
   };
 
@@ -53,105 +44,104 @@ export default function Login({ navigation }) {
   };
 
   return (
-    <ImageBackground
-      style={styles.backgroundImage}
-      sizeMode="cover"
-      source={image}
-    >
-      <View style={styles.loginContainer}>
-        <Text
-          style={{
-            margin: 10,
-            borderRadius: 7,
-            fontSize: 30,
-            fontWeight: "bold",
-            color: "black",
-          }}
-        >
-          LOGIN
-        </Text>
-        <TextInput
-          style={styles.input}
-          mode="outlined"
-          onChangeText={(text) => handleOnchange(text, "email")}
-          onFocus={() => handleError(null, "email")}
-          error={errors.email}
-          placeholder=" email"
-          label="Enter your Email"
-        />
-        <TextInput
-          style={styles.input}
-          mode="outlined"
-          secureTextEntry
-          label=" Enter your Password"
-          onChangeText={(text) => handleOnchange(text, "password")}
-          onFocus={() => handleError(null, "password")}
-          placeholder=" password"
-          error={errors.password}
-        />
-        <Button
-          style={{ margin: 10 }}
-          mode="contained"
-          color="orange"
-          onPress={() => validate()}
-        >
-          Login
-        </Button>
+    <View style={styles.container}>
+      <Text style={styles.loginHeader}>LOGIN</Text>
+      <TextInput
+        style={styles.input}
+        mode="outlined"
+        onChangeText={(text) => handleOnchange(text, "email")}
+        onFocus={() => handleError(null, "email")}
+        error={errors.email}
+        placeholder="Email"
+        label="Enter your Email"
+      />
+      <TextInput
+        style={styles.input}
+        mode="outlined"
+        secureTextEntry
+        label="Enter your Password"
+        onChangeText={(text) => handleOnchange(text, "password")}
+        onFocus={() => handleError(null, "password")}
+        placeholder="Password"
+        error={errors.password}
+      />
+      <Button
+        style={styles.loginButton}
+        mode="contained"
+        onPress={() => validate()}
+      >
+        Login
+      </Button>
 
-        <Text
-          style={{
-            margin: 10,
-            borderRadius: 7,
-            fontSize: 20,
-            fontWeight: "bold",
-            paddingTop: 70,
-
-            color: "black",
-            // backgroundColor: "white",
-          }}
-        >
-          NEW TO SPAM?
-        </Text>
-        <Button
-          style={{ margin: 10 }}
-          mode="contained"
-          color="orange"
-          onPress={() => navigation.navigate("Signup")}
-        >
-          Register Here!
-        </Button>
-      </View>
-    </ImageBackground>
+      <Text style={styles.registerText}>NEW TO SPAM?</Text>
+      <Button
+        style={styles.registerButton}
+        mode="contained"
+        color="#FFC75F"
+        onPress={() => navigation.navigate("Signup")}
+      >
+        Register Here!
+      </Button>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  loginContainer: {
-    // backgroundColor: `gray`,
-    padding: 10,
-    paddingTop: 90,
-
-    // flex: 1,
-    borderRadius: 15,
+  container: {
+    flex: 1,
+    // backgroundColor:"#0ff",
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 0,
+    // height: 300,
   },
-  backgroundImage: {
-    // paddingTop: 50,
-    width: "100%",
-    height: "auto",
-    flex: 1,
-    // justifyContent: "center",
-    alignItems: "center",
-    // opacity:0.8
+  loginHeader: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "black",
+    // fontFamily: "Montserrat",
+    marginBottom: 30,
   },
   input: {
     width: 300,
     height: 50,
-
-    marginHorizontal: 25,
-    margin: 10,
+    marginVertical: 10,
+    paddingHorizontal: 15,
     fontSize: 16,
     borderRadius: 25,
+    backgroundColor: "white",
+    // fontFamily: "Montserrat",
+  },
+  loginButton: {
+    marginVertical: 10,
+    width: 200,
+  },
+  gradient: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 25,
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "white",
+    // fontFamily: "Montserrat",
+    paddingVertical: 12,
+    paddingHorizontal: 40,
+  },
+  registerText: {
+    marginVertical: 20,
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "black",
+    // fontFamily: "Montserrat",
+  },
+  registerButton: {
+    width: 200,
+    // fontFamily: "Montserrat",
   },
 });
+
+// export default Login;

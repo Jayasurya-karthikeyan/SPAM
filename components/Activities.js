@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
   Linking,
 } from "react-native";
 import { Button } from "react-native-paper";
+import { db, messaging, auth } from "../FireBase";
+import { ref, onValue, get } from "firebase/database";
 
 // Define motivational quotes data
 const activity = [
@@ -70,7 +72,6 @@ const activity = [
   {
     id: 6,
     category: "happy",
-
     name: "Kickboxing",
     image: require("../assets/activities/a6.jpg"),
     description:
@@ -81,7 +82,6 @@ const activity = [
   {
     id: 7,
     category: "happy",
-
     name: "Bungee jumping",
     image: require("../assets/activities/a7.jpg"),
     description:
@@ -189,24 +189,112 @@ const activity = [
     website: "https://www.imdb.com/genre/horror/",
     video: "https://www.youtube.com/watch?v=HdELcPN7Vd8",
   },
+  {
+    id: 17,
+    category: "neutral",
+    name: "Kickboxing",
+    image: require("../assets/activities/a6.jpg"),
+    description:
+      "Kickboxing is a physical activity that combines martial arts techniques with boxing.",
+    website: "https://www.titleboxingclub.com/",
+    video: "https://www.youtube.com/watch?v=Hl7x5FmIuVw",
+  },
+  {
+    id: 18,
+    category: "neutral",
+    name: "Bungee jumping",
+    image: require("../assets/activities/a7.jpg"),
+    description:
+      "Bungee jumping is an extreme sport that involves jumping from a tall structure while connected to a bungee cord.",
+    website: "https://www.bungee.com/",
+    video: "https://www.youtube.com/watch?v=hT1OKrTJHN0",
+  },
+  {
+    id: 19,
+    category: "neutral",
+
+    name: "Skydiving",
+    image: require("../assets/activities/a8.jpg"),
+    description:
+      "Skydiving is an extreme sport that involves jumping from an airplane and freefalling before deploying a parachute.",
+    website: "https://www.skydiving.com/",
+    video: "",
+  },
+  {
+    id: 20,
+    category: "neutral",
+
+    name: "Cooking",
+    image: require("../assets/activities/a2.jpg"),
+    description:
+      "Cooking involves preparing food using various techniques such as chopping, mixing, and baking.",
+    website: "https://www.foodnetwork.com/recipes",
+    video: "https://www.youtube.com/watch?v=rhV7Ez_LGMU",
+  },
 ];
 
 const MotivationalQuotesApp = () => {
-  const video = () => {
+  const [data, setData] = useState();
+
+  const currentUser = auth.currentUser;
+  // if (currentUser) {
+  const userId = currentUser.uid;
+  // console.log("Current user ID:", userId);
+  // } else {
+  //   console.log("No user is currently logged in.");
+  // }
+
+  useEffect(() => {
+    const usersRef = ref(db, "Users");
+    if (currentUser) {
+      get(usersRef)
+        .then((snapshot) => {
+          const usersData = snapshot.val();
+          let usersArray;
+
+          // If "Users" data doesn't exist, create a new array
+          if (!usersData) {
+            usersArray = [];
+          } else {
+            // If "Users" data exists, convert it to an array
+            usersArray = Object.values(usersData);
+          }
+
+          // Find the user with the matching user ID
+          const userIndex = usersArray.findIndex((user) => user.uid === userId);
+
+          if (userIndex !== -1) {
+            // User found, update the location parameter
+            setData(usersArray[userIndex].emotion.toLowerCase());
+            console.log(usersArray[userIndex]);
+          } else {
+            console.log("User not found.");
+          }
+        })
+        .catch((error) => {
+          console.error("Error retrieving current user data:", error);
+        });
+    } else {
+      console.log("No user is currently logged in.");
+    }
+    console.log(data);
+  }, []);
+
+  const video = (i) => {
     // Open video in a new screen or modal
     // Example:
-    Linking.openURL(activity[1].video);
+    Linking.openURL(activity[i].video);
   };
 
-  const website = () => {
+  const website = (i) => {
     // Open website in a webview or in the device's default browser
     // Example:
-    Linking.openURL(activity[1].website);
+    Linking.openURL(activity[i].website);
   };
   // const []
   // Render individual quote card
   const renderQuoteCard = ({ item }) =>
-    item && item.category === "happy" ? (
+    item && item.category === data ? (
       <View style={styles.cardContainer}>
         <Image source={item.image} style={styles.image} resizeMode="contain" />
         <Text
@@ -230,7 +318,7 @@ const MotivationalQuotesApp = () => {
               style={{ margin: 10 }}
               mode="contained"
               color="orange"
-              onPress={() => website()}
+              onPress={() => website(item.id - 1)}
             >
               website
             </Button>
@@ -244,7 +332,7 @@ const MotivationalQuotesApp = () => {
           style={{ margin: 10 }}
           mode="contained"
           color="orange"
-          onPress={() => video()}
+          onPress={() => video(item.id - 1)}
         >
           video
         </Button>
