@@ -27,6 +27,7 @@ export default function App() {
     latitude: 13.059278,
     longitude: 80.233656,
   });
+  const [isAvailable, setIsAvailable] = useState(false);
   const [add, setAdd] = useState();
   // useEffect(() => console.log("+++++++++++++++++++++++++++++++++++", pin), pin);
   useEffect(() => {
@@ -43,7 +44,10 @@ export default function App() {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       });
-      sendSMS(1, "Helloo!! pundamanaee!");
+      const isAvai = await SMS.isAvailableAsync();
+      setIsAvailable(isAvai);
+      // sendSMS("+916374460535","Hiiiiiiiii")
+      getAddress(pin);
     })();
   }, []);
 
@@ -65,6 +69,8 @@ export default function App() {
   // };
 
   const sendSMS = async (phoneNumber, message) => {
+    const { result } = await SMS.sendSMSAsync(phoneNumber, message);
+    console.log(result);
     // const accountSid = "AC24dedb2f98c89068b149c7d0aac05689";
     // const authToken = "57ed317c061dba9458df9cea8af5ac8c";
     // // var twilio = require("twilio")(accountSid, authToken);
@@ -87,10 +93,10 @@ export default function App() {
   };
 
   const getAddress = async (location) => {
-    const { latitude, longitude } = location;
+    const { Latitude, Longitude } = location;
     const address = await Location.reverseGeocodeAsync({
-      latitude,
-      longitude,
+      latitude: Latitude,
+      longitude: Longitude,
     });
 
     if (address.length > 0) {
@@ -100,7 +106,7 @@ export default function App() {
       const fullAddress = `${name}, ${street},${district}, ${city}, ${region}, ${postalCode}, ${country}`;
       console.log("Address:", fullAddress);
       setAdd(fullAddress);
-      return address;
+      return fullAddress;
     } else {
       console.log("No address found");
     }
@@ -128,9 +134,10 @@ export default function App() {
 
         if (userIndex !== -1) {
           const phoneNumber = usersArray[userIndex].phone; // Replace with the desired phone number
+          const add = getAddress(usersArray[userIndex].location);
           const message =
             "Alert! Your ward has moved to" +
-            getAddress(usersArray[userIndex].location) +
+            add +
             " which is" +
             distance / 1000 +
             "km from the previous location"; // Replace with the desired message
