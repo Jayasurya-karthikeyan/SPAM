@@ -26,10 +26,16 @@
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
-      ]
+      ],
+      "package": "com.jayasurya_7.spam"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7e7bf70c-ec01-4509-9cb9-413f3b6300d9"
+      }
     }
   }
 }

@@ -3,9 +3,11 @@ import React, { useEffect, useState } from "react";
 import { View, Image, StyleSheet, Text } from "react-native";
 import { TouchableOpacity } from "react-native";
 import { auth, db } from "../FireBase";
+import * as Location from "expo-location";
 
 export default function Profile({ navigation }) {
   const [data, setData] = useState([]);
+  const [add, setAdd] = useState(null);
 
   const currentUser = auth.currentUser;
   // if (currentUser) {
@@ -38,6 +40,10 @@ export default function Profile({ navigation }) {
             // User found, update the location parameter
             setData(usersArray[userIndex]);
             console.log(usersArray[userIndex]);
+
+            getAddress(usersArray[userIndex].location)
+              .then((ad) => console.log(a))
+              .catch((e) => console.log(e));
           } else {
             console.log("User not found.");
           }
@@ -51,6 +57,28 @@ export default function Profile({ navigation }) {
     console.log(data);
   }, []);
 
+  const getAddress = async (location) => {
+    const { Latitude, Longitude } = location;
+    const address = await Location.reverseGeocodeAsync({
+      latitude: Latitude,
+      longitude: Longitude,
+    });
+
+    if (address.length > 0) {
+      console.log(address[0]);
+      const { street, city, district, name, region, postalCode, country } =
+        address[0];
+      const fullAddress = `${name}, ${
+        street ? street : ""
+      },${district}, ${city}, ${region}, ${postalCode}, ${country}`;
+      console.log("Address:", fullAddress);
+      setAdd(fullAddress);
+      return address;
+    } else {
+      console.log("No address found");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -59,9 +87,7 @@ export default function Profile({ navigation }) {
       <View style={styles.profileContainer}>
         <Text style={styles.profileItem}>{data?.fullname}</Text>
         <Text style={styles.profileItem}>{data?.email}</Text>
-        <Text style={styles.profileItem}>
-          LICET, Nungambakkam, Chennai, India
-        </Text>
+        <Text style={styles.profileItem}>{add}</Text>
         <Text style={styles.profileItem}>{data?.phone}</Text>
         <TouchableOpacity
           style={styles.buttonContainer}

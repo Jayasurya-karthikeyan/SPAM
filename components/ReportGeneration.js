@@ -7,6 +7,7 @@ import { shareAsync } from "expo-sharing";
 import { db, messaging, auth } from "../FireBase";
 import { ref, onValue, get } from "firebase/database";
 import database from "firebase/database";
+import * as Location from "expo-location";
 import * as MailComposer from "expo-mail-composer";
 import * as Print from "expo-print";
 
@@ -14,6 +15,7 @@ import * as Print from "expo-print";
 
 export default function Report() {
   const [data, setData] = useState([]);
+  const [add, setAdd] = useState(null);
 
   // useEffect(()=>{
   //   getFCMToken()
@@ -44,6 +46,8 @@ export default function Report() {
   //   console.log("No user is currently logged in.");
   // }
 
+  useEffect(() => console.log(add), add);
+
   useEffect(() => {
     const usersRef = ref(db, "Users");
     if (currentUser) {
@@ -66,7 +70,11 @@ export default function Report() {
           if (userIndex !== -1) {
             // User found, update the location parameter
             setData(usersArray[userIndex]);
-            console.log(usersArray[userIndex]);
+
+            getAddress(usersArray[userIndex].location)
+              .then((ad) => console.log(a))
+              .catch((e) => console.log(e));
+            console.log(usersArray[userIndex].location);
           } else {
             console.log("User not found.");
           }
@@ -79,6 +87,28 @@ export default function Report() {
     }
     console.log(data);
   }, []);
+
+  const getAddress = async (location) => {
+    const { Latitude, Longitude } = location;
+    const address = await Location.reverseGeocodeAsync({
+      latitude: Latitude,
+      longitude: Longitude,
+    });
+
+    if (address.length > 0) {
+      console.log(address[0]);
+      const { street, city, district, name, region, postalCode, country } =
+        address[0];
+      const fullAddress = `${name}, ${
+        street ? street : ""
+      },${district}, ${city}, ${region}, ${postalCode}, ${country}`;
+      console.log("Address:", fullAddress);
+      setAdd(fullAddress);
+      return address;
+    } else {
+      console.log("No address found");
+    }
+  };
 
   const html = `
 
@@ -112,26 +142,30 @@ export default function Report() {
     <table>
 
         <tr>
-            <td class="json-key">uid</td>
+            <td class="json-key">User ID</td>
             <td>${data?.uid}</td>
         </tr>
         <tr>
-            <td class="json-key">email</td>
+            <td class="json-key">Email</td>
             <td>${data?.email}</td>
         </tr>        <tr>
-            <td class="json-key">phone</td>
+            <td class="json-key">Phone</td>
             <td>${data?.phone}</td>
         </tr>
         <tr>
-            <td class="json-key">type</td>
+            <td class="json-key">Type</td>
             <td>${data?.type}</td>
         </tr>
         <tr>
-            <td class="json-key">search</td>
+            <td class="json-key">Search</td>
             <td>${data?.Search}</td>
         </tr>
         <tr>
-            <td class="json-key">emotion</td>
+            <td class="json-key">Location</td>
+            <td>${add}</td>
+        </tr>
+        <tr>
+            <td class="json-key">Emotion</td>
             <td>${data?.emotion}</td>
         </tr>
     </table>
@@ -200,10 +234,12 @@ export default function Report() {
         <Text style={styles.keyText}>emotion</Text>
         <Text style={styles.valueText}>{data?.emotion}</Text>
       </View>
-      {/* <View style={styles.table}>
-        <Text style={styles.keyText}>location</Text>
-        <Text style={styles.valueText}>{data?.location}</Text>
-      </View> */}
+      {add && (
+        <View style={styles.table}>
+          <Text style={styles.keyText}>location</Text>
+          <Text style={styles.valueText}>{add}</Text>
+        </View>
+      )}
     </View>
     // <View style={styles.container}>
     //   <Text style={styles.text}>Today's Report</Text>

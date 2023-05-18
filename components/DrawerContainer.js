@@ -14,6 +14,8 @@ import Profile from "./Profile";
 import Emotion from "./Emotion";
 import LoginStackNavigator from "./LoginStackNavigator";
 import { auth } from "../FireBase";
+import { MaterialIcons } from "@expo/vector-icons";
+
 const Drawer = createDrawerNavigator();
 
 export default function DrawerContainer(props) {
@@ -62,16 +64,16 @@ export default function DrawerContainer(props) {
             component={Location}
             options={{
               drawerIcon: ({ color }) => (
-                <AntDesign name="profile" size={25} color={color} />
+                <MaterialIcons name="location-pin" size={25} color="black" />
               ),
             }}
           />
           <Drawer.Screen
-            name="KeyPad"
+            name="Status"
             component={KeyPad}
             options={{
               drawerIcon: ({ color }) => (
-                <AntDesign name="shrink" size={25} color={color} />
+                <MaterialIcons name="keyboard" size={25} color="black" />
               ),
             }}
           />
@@ -80,7 +82,7 @@ export default function DrawerContainer(props) {
             component={AppUsage}
             options={{
               drawerIcon: ({ color }) => (
-                <AntDesign name="caretup" size={25} color={color} />
+                <AntDesign name="profile" size={25} color={color} />
               ),
             }}
           />
@@ -89,7 +91,7 @@ export default function DrawerContainer(props) {
             component={Emotion}
             options={{
               drawerIcon: ({ color }) => (
-                <AntDesign name="caretup" size={25} color={color} />
+                <MaterialIcons name="tag-faces" size={25} color="black" />
               ),
             }}
           />

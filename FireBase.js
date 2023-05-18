@@ -22,11 +22,11 @@ if (firebase.apps.length === 0) {
   app = firebase.app();
 }
 
-console.log(app);
+// console.log(app);
 // const messaging = getMessaging(app);
 
 const auth = firebase.auth();
 const db = getDatabase(app);
-console.log(auth, db);
+// console.log(auth, db);
 
 export { auth, db, firebase };

@@ -18,6 +18,12 @@ export default function AppUsage({ navigation }) {
       description: "1 Hour 20 minutes",
     },
     {
+      id: 18,
+      image: require("../assets/logo/youtube.png"),
+      title: "Youtube",
+      description: "1 Hour 02 minutes",
+    },
+    {
       id: 2,
       image: require("../assets/logo/settings.png"),
       title: "Settings",
@@ -115,12 +121,6 @@ export default function AppUsage({ navigation }) {
       description: "Recently not used",
     },
     {
-      id: 18,
-      image: require("../assets/logo/youtube.png"),
-      title: "Youtube",
-      description: "Recently not used",
-    },
-    {
       id: 19,
       image: require("../assets/logo/google-play-movie.png"),
       title: "Play movies & TV",
@@ -134,7 +134,7 @@ export default function AppUsage({ navigation }) {
     },
   ];
   const handlePress = () => {
-    navigation.navigate("KeyPad");
+    // navigation.navigate("KeyPad");
   };
   const Card = ({ image, title, description }) => {
     return (

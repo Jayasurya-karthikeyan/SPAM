@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import MapView, { Circle, Marker } from "react-native-maps";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import * as Location from "expo-location";
 import { db, auth } from "../FireBase";
 import { ref, get, set } from "firebase/database";
@@ -8,6 +8,9 @@ import Communications from "react-native-communications";
 import axios from "axios";
 import { encode } from "base-64";
 import Geocoder from "react-native-geocoding";
+import * as SMS from "expo-sms";
+
+// import { sendSMS } from "./indexx";
 
 export default function App() {
   const pin1 = {
@@ -24,6 +27,7 @@ export default function App() {
     latitude: 13.059278,
     longitude: 80.233656,
   });
+  const [add, setAdd] = useState();
   // useEffect(() => console.log("+++++++++++++++++++++++++++++++++++", pin), pin);
   useEffect(() => {
     (async () => {
@@ -39,11 +43,12 @@ export default function App() {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       });
+      sendSMS(1, "Helloo!! pundamanaee!");
     })();
   }, []);
 
-  const currentUser = auth.currentUser;
-  const userId = currentUser.uid;
+  const currentUser = auth?.currentUser;
+  const userId = currentUser?.uid;
 
   // const sendSMS = (phoneNumber, message) => {
   //   return new Promise((resolve, reject) => {
@@ -60,18 +65,14 @@ export default function App() {
   // };
 
   const sendSMS = async (phoneNumber, message) => {
-    const accountSid = "AC24dedb2f98c89068b149c7d0aac05689";
-    const authToken = "57ed317c061dba9458df9cea8af5ac8c";
-
-    // var twilio = require("twilio")(accountSid, authToken);
-
-    // const apiUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-
+    // const accountSid = "AC24dedb2f98c89068b149c7d0aac05689";
+    // const authToken = "57ed317c061dba9458df9cea8af5ac8c";
+    // // var twilio = require("twilio")(accountSid, authToken);
+    // const apiUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Calls`;
     // const data = new URLSearchParams();
-    // data.append("To", '+916374460535');
+    // data.append("To", "+916374460535");
     // data.append("From", "+12543748761");
     // data.append("Body", message);
-
     // try {
     //   const response = await axios.post(apiUrl, data, {
     //     auth: {
@@ -79,23 +80,26 @@ export default function App() {
     //       password: authToken,
     //     },
     //   });
-
     //   console.log("SMS sent successfully. SID:", response.data.sid);
     // } catch (error) {
     //   console.error("Error sending SMS:", error);
     // }
   };
 
-  const getAddress = async () => {
+  const getAddress = async (location) => {
+    const { latitude, longitude } = location;
     const address = await Location.reverseGeocodeAsync({
       latitude,
       longitude,
     });
 
     if (address.length > 0) {
-      const { street, city, region, postalCode, country } = address[0];
-      const fullAddress = `${street}, ${city}, ${region}, ${postalCode}, ${country}`;
+      console.log(address[0]);
+      const { street, city, district, name, region, postalCode, country } =
+        address[0];
+      const fullAddress = `${name}, ${street},${district}, ${city}, ${region}, ${postalCode}, ${country}`;
       console.log("Address:", fullAddress);
+      setAdd(fullAddress);
       return address;
     } else {
       console.log("No address found");
@@ -103,7 +107,7 @@ export default function App() {
   };
 
   const alertParent = async (distance, location) => {
-    const address = await getAddress();
+    const address = await getAddress(location);
 
     const usersRef = ref(db, "Users");
     get(usersRef)
@@ -123,9 +127,11 @@ export default function App() {
         const userIndex = usersArray.findIndex((user) => user.uid === userId);
 
         if (userIndex !== -1) {
-          const phoneNumber = 6374460535; // Replace with the desired phone number
+          const phoneNumber = usersArray[userIndex].phone; // Replace with the desired phone number
           const message =
-            "Alert! Your ward has moved to this place of distance" +
+            "Alert! Your ward has moved to" +
+            getAddress(usersArray[userIndex].location) +
+            " which is" +
             distance / 1000 +
             "km from the previous location"; // Replace with the desired message
 
@@ -148,7 +154,7 @@ export default function App() {
 
     console.log("Message will be sent");
   };
-  alertParent(1100, pin);
+  // alertParent(1100, pin);
 
   useEffect(() => {
     const usersRef = ref(db, "Users");
@@ -280,6 +286,7 @@ export default function App() {
           description="The place where your child last visited"
         />
         <Circle center={pin} radius={250}></Circle>
+        <View></View>
       </MapView>
     </View>
   );
@@ -292,5 +299,13 @@ const styles = StyleSheet.create({
   map: {
     width: "100%",
     height: "100%",
+  },
+  add: {
+    fontSize: 20,
+    padding: 10,
+    margin: 10,
+    position: "fixed",
+    backgroundColor: "#ff0",
+    bottom: 10,
   },
 });
